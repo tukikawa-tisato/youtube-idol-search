@@ -1,65 +1,159 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React, { useState } from "react";
+import axios from "axios";
+import Button from "@material-ui/core/Button";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Grid,
+} from "@material-ui/core";
+
+const KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
+const youtube = axios.create({
+  baseURL: "https://www.googleapis.com/youtube/v3",
+});
+const params = {
+  part: "snippet",
+  maxResults: 40,
+  key: KEY,
+  regionCode: "JP",
+  type: "video",
+};
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  title: {
+    flexGrow: 2,
+  },
+  button: {
+    fontSize: "16px",
+    fontWeight: "bold",
+    marginRight: 10,
+  },
+  movies: {
+    marginTop: 30,
+  },
+  movie: {
+    marginTop: 10,
+  },
+  card: {
+    maxWidth: 345,
+  },
+  cardMedia: {
+    height: 140,
+  },
+}));
 
 export default function Home() {
+  const classes = useStyles();
+  const [movies, setMovies] = useState([]);
+
+  console.log(process.env.REACT_APP_YOUTUBE_API);
+
+  const search = (word) => {
+    console.log(params);
+    youtube
+      .get("/search", {
+        params: {
+          ...params,
+          q: word,
+          order: "date",
+        },
+      })
+      .then((res) => {
+        console.log(res.data.items);
+        setMovies(res.data.items);
+      });
+  };
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography className={classes.title} variant="h6" noWrap>
+            Yotube アイドル検索
+          </Typography>
+          <Button
+            color="inherit"
+            className={classes.button}
+            onClick={() => search("日向坂46")}
           >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
+            日向坂46
+          </Button>
+          <Button
+            color="inherit"
+            className={classes.button}
+            onClick={() => search("乃木坂46")}
           >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+            乃木坂46
+          </Button>
+          <Button
+            color="inherit"
+            className={classes.button}
+            onClick={() => search("櫻坂46")}
+          >
+            櫻坂46
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Grid
+        container
+        alignItems="center"
+        justify="center"
+        spacing={1}
+        className={classes.movies}
+      >
+        {movies &&
+          movies.map((movie) => {
+            const url = `https://www.youtube.com/watch?v=${movie.id.videoId}`;
+            return (
+              <Grid
+                container
+                item
+                xs={3}
+                spacing={3}
+                key={movie.id.videoId}
+                className={classes.movie}
+              >
+                <a href={url}>
+                  <Card className={classes.card}>
+                    <CardActionArea>
+                      <CardMedia
+                        className={classes.cardMedia}
+                        component="img"
+                        alt={movie.snippet.title}
+                        image={movie.snippet.thumbnails.medium.url}
+                        title={movie.snippet.title}
+                      />
+                    </CardActionArea>
+                    <CardContent>
+                      <Typography
+                        gutterBottom
+                        variant="h5"
+                        component="h2"
+                        className={classes.movieTitle}
+                      >
+                        {movie.snippet.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        component="p"
+                      ></Typography>
+                    </CardContent>
+                  </Card>
+                </a>
+              </Grid>
+            );
+          })}
+      </Grid>
+    </>
+  );
 }
