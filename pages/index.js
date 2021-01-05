@@ -55,8 +55,6 @@ export default function Home() {
   const classes = useStyles();
   const [movies, setMovies] = useState([]);
 
-  console.log(process.env.REACT_APP_YOUTUBE_API);
-
   const search = (word) => {
     console.log(params);
     youtube
