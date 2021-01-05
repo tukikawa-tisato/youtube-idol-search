@@ -19,7 +19,7 @@ const youtube = axios.create({
 });
 const params = {
   part: "snippet",
-  maxResults: 40,
+  maxResults: 200,
   key: KEY,
   regionCode: "JP",
   type: "video",
