@@ -56,7 +56,6 @@ export default function Home() {
   const [movies, setMovies] = useState([]);
 
   const search = (word) => {
-    console.log(params);
     youtube
       .get("/search", {
         params: {
@@ -66,7 +65,6 @@ export default function Home() {
         },
       })
       .then((res) => {
-        console.log(res.data.items);
         setMovies(res.data.items);
       });
   };
